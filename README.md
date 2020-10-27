@@ -6,4 +6,4 @@ I'm trying to get better at writing in python through
 project-based learning because I find it enjoyable.
 
 # Installation/How to Run
-python3 main.py
+coming soon
