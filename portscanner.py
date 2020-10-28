@@ -1,84 +1,75 @@
-import argparse
-import socket # for connecting
-from colorama import init, Fore
+import socket
+import _thread
+import time
+class Core(object):
+    ipurl=0
+    mode=1024
+    menu1=False
+    f=None
+    network_speed="LAN"
+    menu2=False
+    def GetData(self, url):
+        self.url = url
+        try:
+            self.ipurl = socket.gethostbyname(self.url)
+        except Exception as e:
+            print ("Invalid URL or IP")
+            exit(0)
+        Core.ipurl=self.ipurl
+        ascii_banner = pyfiglet.figlet_format("PortScanner")
+        print(ascii_banner)
+        while Core.menu1 is not True:
+            choice = input("\n1 - simple \n2 - extended\n")
+            if choice == "1":
+                Core.mode=1024
+                menu=True
+                break
+            elif choice == "2":
+                Core.mode=64000
+                menu = True
+                break
+            else:
+                print("You can only pick 1 and 2")
+        while Core.menu2 is not True:
+            choice = input("\n1 - LAN \n2 - Global Network\n")
+            if choice == "1":
+                Core.network_speed=0.05
+                menu2=True
+                break
+            elif choice == "2":
+                Core.network_speed=0.3
+                menu2 = True
+                break
+            else:
+                print("You can only pick 1 and 2")
 
-from threading import Thread, Lock
-from queue import Queue
-
-# some colors
-init()
-GREEN = Fore.GREEN
-RESET = Fore.RESET
-GRAY = Fore.LIGHTBLACK_EX
-
-# number of threads, feel free to tune this parameter as you wish
-N_THREADS = 200
-# thread queue
-q = Queue()
-print_lock = Lock()
-
-def port_scan(port):
-    """
-    Scan a port on the global variable `host`
-    """
-    try:
-        s = socket.socket()
-        s.connect((host, port))
-    except:
-        with print_lock:
-            print(f"{GRAY}{host:15}:{port:5} is closed  {RESET}", end='\r')
-    else:
-        with print_lock:
-            print(f"{GREEN}{host:15}:{port:5} is open    {RESET}")
-    finally:
-        s.close()
-
-
-def scan_thread():
-    global q
-    while True:
-        # get the port number from the queue
-        worker = q.get()
-        # scan that port number
-        port_scan(worker)
-        # tells the queue that the scanning for that port 
-        # is done
-        q.task_done()
-
-
-def main(host, ports):
-    global q
-    for t in range(N_THREADS):
-        # for each thread, start it
-        t = Thread(target=scan_thread)
-        # when we set daemon to true, that thread will end when the main thread ends
-        t.daemon = True
-        # start the daemon thread
-        t.start()
-
-    for worker in ports:
-        # for each port, put that port into the queue
-        # to start scanning
-        q.put(worker)
-    
-    # wait the threads ( port scanners ) to finish
-    q.join()
-
-
-if __name__ == "__main__":
-    # parse some parameters passed
-    parser = argparse.ArgumentParser(description="Simple port scanner")
-    parser.add_argument("host", help="Host to scan.")
-    parser.add_argument("--ports", "-p", dest="port_range", default="1-65535", help="Port range to scan, default is 1-65535 (all ports)")
-    args = parser.parse_args()
-    host, port_range = args.host, args.port_range
-
-    start_port, end_port = port_range.split("-")
-    start_port, end_port = int(start_port), int(end_port)
-
-    ports = [ p for p in range(start_port, end_port)]
-
-    main(host, ports)
+    def Start_Scan(self, port_start, port_end):
+        Core.f = open(Core.ipurl, "a")
+        try:
+            for x in range(port_start,port_end):
+                sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                res = sock.connect_ex((Core.ipurl,x))
+                if res == 0:
+                    tmp="Port",x,"is open", socket.getservbyport(x)
+                    tmp1=str(tmp[0])+" "+str(tmp[1])+" "+str(tmp[2])+" "+str(tmp[3])
+                    print(bcolors.OKGREEN,tmp1)
+                    Core.f.write(str(tmp)+"\n")
+            Core.f.close()
+        except Exception as e:
+            print (e)
+try:
+    scan = Core()
+    scan.GetData(input("Input Target IP or website\n"))
+    print(bcolors.WARNING,"Range:",Core.mode,"\n Target:",Core.ipurl,"\n Scanning speed:",Core.network_speed,bcolors.ENDC)
+    print(bcolors.BOLD,"Scanning...",bcolors.ENDC)
+    for count in range(0,Core.mode):
+        #print (Core.mode)
+        time.sleep(Core.network_speed)
+        _thread.start_new_thread(scan.Start_Scan, (count,count+1))
+        if count > Core.mode:
+            exit(0)
+except Exception as e:
+    print (e)
 
     Clear = int(input("Press 1 to Continue or press Ctrl+C to quit: "))
 
