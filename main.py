@@ -1,9 +1,6 @@
-print("╭━╮╭━╮╱╱╱╱╱╱╱╱╭╮╱╭╮╱╱╭╮")
-print("╰╮╰╯╭╯╱╱╱╱╱╱╱╱┃┃╱┃┃╱╱┃┃")
-print("╱╰╮╭╯╭━━┳━╮╭━━┫╰━╯┣╮╭┫╰━╮")
-print("╱╭╯╰╮┃┃━┫╭╮┫╭╮┃╭━╮┃┃┃┃╭╮┃")
-print("╭╯╭╮╰┫┃━┫┃┃┃╰╯┃┃╱┃┃╰╯┃╰╯┃")
-print("╰━╯╰━┻━━┻╯╰┻━━┻╯╱╰┻━━┻━━╯")
+import pyfiglet
+ascii_banner = pyfiglet.figlet_format("XenoHub")
+print(ascii_banner)
 print("\033[1;32;40m $$$ Gangstar $$$  \n")
 print('1 - Ip Tracker')
 print('2 - Port Scanner')
@@ -18,7 +15,7 @@ if Options == 1:
  	exec(open("iptracker.py").read())
 else:
 	if Options == 2:
-		exec(open("portscanner.py").read())
+		exec(open("port.py").read())
 	else:
 		if Options == 3:
 			exec(open("proxy.py").read())
@@ -28,4 +25,10 @@ else:
 			else:
 				if Options == 5:
 					exec(open("brute.py").read())
+				else:
+					if Options == 6:
+						exec(open("scrape.py").read())
+					else: print("That is not an option!")
+
+
 
